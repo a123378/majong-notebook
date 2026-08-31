@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import { Sparkles, Target, Flame, DollarSign, Handshake } from 'lucide-react';
+import React from 'react';
+import { Sparkles } from 'lucide-react';
 import { RoundActionType } from '../../types/mahjong';
 import { playTileClickSound } from '../../services/sound';
 
