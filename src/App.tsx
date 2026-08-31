@@ -111,7 +111,7 @@ export const App: React.FC = () => {
       </main>
 
       {/* Floating Bottom Tab Bar for Mobile Navigation */}
-      <nav className="sticky bottom-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-2 px-6 sm:hidden">
+      <nav className="sticky bottom-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] px-6 sm:hidden">
         <div className="flex items-center justify-around">
           <button
             onClick={() => setActiveTab('dashboard')}
