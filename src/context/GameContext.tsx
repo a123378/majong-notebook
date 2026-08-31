@@ -74,6 +74,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Initialize from IndexedDB
   useEffect(() => {
+    let unsubscribeFirebase: (() => void) | undefined;
+    
     async function init() {
       try {
         const savedBase = await getSettingDB<number>('default_base', 50);
@@ -90,12 +92,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const localHistory = await getAllGameHistoryDB();
         setHistorySessions(localHistory);
         
-        // Then fetch from Firebase silently in the background
-        import('../services/syncService').then(async ({ fetchRemoteSessions }) => {
-          const remoteSessions = await fetchRemoteSessions('PERSONAL');
-          if (remoteSessions.length > 0) {
-            setHistorySessions(remoteSessions);
-          }
+        // Then start real-time listener from Firebase silently in the background
+        import('../services/syncService').then(({ subscribeToRemoteSessions }) => {
+          unsubscribeFirebase = subscribeToRemoteSessions((sessions) => {
+            if (sessions.length > 0) {
+              setHistorySessions(sessions);
+            }
+          });
         });
         
       } catch (e) {
@@ -105,6 +108,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
     init();
+
+    return () => {
+      if (unsubscribeFirebase) {
+        unsubscribeFirebase();
+      }
+    };
   }, []);
 
   const refreshHistory = useCallback(async () => {

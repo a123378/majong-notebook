@@ -8,7 +8,7 @@ import {
   saveGameToHistoryDB,
 } from './db';
 import { db } from './firebase';
-import { doc, setDoc, getDocs, collection, query, orderBy } from 'firebase/firestore';
+import { doc, setDoc, getDocs, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 const CLOUD_CONFIG_KEY = 'cloud_config';
 
@@ -109,29 +109,29 @@ export async function processOfflineSyncQueue(): Promise<boolean> {
   }
 }
 
-export async function fetchRemoteSessions(_roomCode: string): Promise<GameSession[]> {
+export function subscribeToRemoteSessions(callback: (sessions: GameSession[]) => void): () => void {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
-    return [];
+    return () => {};
   }
 
-  try {
-    const q = query(collection(db, 'mahjong_sessions'), orderBy('startTime', 'desc'));
-    const snapshot = await getDocs(q);
+  const q = query(collection(db, 'mahjong_sessions'), orderBy('startTime', 'desc'));
+  
+  const unsubscribe = onSnapshot(q, (snapshot) => {
     const sessions: GameSession[] = [];
     snapshot.forEach((doc) => {
       sessions.push(doc.data() as GameSession);
     });
     
-    // Merge into local DB
-    for (const session of sessions) {
-      await saveGameToHistoryDB(session);
-    }
+    // Merge into local DB for offline access later
+    sessions.forEach(session => saveGameToHistoryDB(session).catch(console.error));
     
-    return sessions;
-  } catch (err) {
-    console.warn('Failed to fetch from Firebase:', err);
-    return [];
-  }
+    // Notify the UI
+    callback(sessions);
+  }, (err) => {
+    console.warn('Failed to listen to Firebase:', err);
+  });
+
+  return unsubscribe;
 }
 
 async function uploadToFirebase(item: SyncQueueItem): Promise<boolean> {
