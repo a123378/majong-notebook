@@ -8,7 +8,7 @@ import {
   saveGameToHistoryDB,
 } from './db';
 import { db } from './firebase';
-import { doc, setDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 const CLOUD_CONFIG_KEY = 'cloud_config';
 
@@ -155,4 +155,16 @@ if (typeof window !== 'undefined') {
   window.addEventListener('offline', () => {
     getSyncQueue().then((queue) => notifySyncStatus(false, queue.length));
   });
+}
+
+export async function deleteRemoteSession(id: string): Promise<boolean> {
+  try {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
+    const docRef = doc(db, 'mahjong_sessions', id);
+    await deleteDoc(docRef);
+    return true;
+  } catch (e) {
+    console.error('Error deleting from Firebase:', e);
+    return false;
+  }
 }

@@ -227,15 +227,27 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetCurrentGame = useCallback(async () => {
     playTileClickSound();
+    const oldId = activeGame.id;
     const freshGame = createNewGameSession(activeGame.base, activeGame.taiPrice);
     setActiveGame(freshGame);
     await saveCurrentGameDB(freshGame);
     await queueOrPushSession(freshGame);
+    
+    // Also delete the abandoned old game from local DB and Firebase
+    await deleteGameFromHistoryDB(oldId);
+    import('../services/syncService').then(({ deleteRemoteSession }) => {
+      deleteRemoteSession(oldId).catch(console.error);
+    });
   }, [activeGame]);
 
   const deleteHistorySession = useCallback(
     async (id: string) => {
       await deleteGameFromHistoryDB(id);
+      
+      import('../services/syncService').then(({ deleteRemoteSession }) => {
+        deleteRemoteSession(id).catch(console.error);
+      });
+      
       await refreshHistory();
     },
     [refreshHistory]
