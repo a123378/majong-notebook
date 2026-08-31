@@ -8,7 +8,7 @@ import {
   saveGameToHistoryDB,
 } from './db';
 import { db } from './firebase';
-import { doc, setDoc, getDocs, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 const CLOUD_CONFIG_KEY = 'cloud_config';
 
