@@ -1,4 +1,4 @@
-﻿import { GameSession, SyncQueueItem, CloudConfig } from '../types/mahjong';
+import { GameSession, SyncQueueItem, CloudConfig } from '../types/mahjong';
 import {
   addToSyncQueue,
   getSyncQueue,
@@ -137,7 +137,10 @@ export async function fetchRemoteSessions(_roomCode: string): Promise<GameSessio
 async function uploadToFirebase(item: SyncQueueItem): Promise<boolean> {
   try {
     const docRef = doc(db, 'mahjong_sessions', item.data.id);
-    await setDoc(docRef, item.data, { merge: true });
+    // Firestore rejects `undefined` values. 
+    // JSON.stringify strips undefined properties automatically.
+    const cleanData = JSON.parse(JSON.stringify(item.data));
+    await setDoc(docRef, cleanData, { merge: true });
     return true;
   } catch (e) {
     console.error('Error uploading to Firebase:', e);
