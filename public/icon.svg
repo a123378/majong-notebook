@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+
+    <!-- Notebook Cover Gradient -->
+    <linearGradient id="bookCoverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#065f46" />
+      <stop offset="50%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+
+    <!-- Gold Accent Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+
+    <!-- Tile Surface Gradient -->
+    <linearGradient id="tileSurface" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f1f5f9" />
+    </linearGradient>
+
+    <!-- Tile Side Gradient (Bamboo Green Backing) -->
+    <linearGradient id="tileBacking" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+    <filter id="tileShadow" x="-15%" y="-15%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Base App Background (Squircle) -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-opacity="0.4" />
+
+  <!-- NOTEBOOK BODY -->
+  <g transform="translate(68, 64)" filter="url(#dropShadow)">
+    <!-- Notebook Back Page Shadow/Layers -->
+    <rect x="22" y="16" width="344" height="376" rx="28" fill="#e2e8f0" opacity="0.85" />
+    <rect x="18" y="10" width="344" height="376" rx="28" fill="#f8fafc" />
+
+    <!-- Notebook Main Cover (Rich Emerald Green Leather) -->
+    <rect x="10" y="0" width="350" height="384" rx="28" fill="url(#bookCoverGrad)" />
+    <!-- Cover Border Emboss -->
+    <rect x="22" y="12" width="326" height="360" rx="20" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-opacity="0.75" />
+
+    <!-- Left Notebook Spine / Binding Stripe -->
+    <rect x="10" y="0" width="46" height="384" rx="28" fill="#022c22" />
+    <!-- Spine line divider -->
+    <line x1="56" y1="0" x2="56" y2="384" stroke="url(#goldGrad)" stroke-width="2.5" stroke-opacity="0.6" />
+
+    <!-- Notebook Spiral Rings / Stitching -->
+    <g fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5">
+      <ellipse cx="32" cy="56" rx="7" ry="12" fill="url(#goldGrad)" stroke="#78350f" />
+      <ellipse cx="32" cy="112" rx="7" ry="12" fill="url(#goldGrad)" stroke="#78350f" />
+      <ellipse cx="32" cy="168" rx="7" ry="12" fill="url(#goldGrad)" stroke="#78350f" />
+      <ellipse cx="32" cy="224" rx="7" ry="12" fill="url(#goldGrad)" stroke="#78350f" />
+      <ellipse cx="32" cy="280" rx="7" ry="12" fill="url(#goldGrad)" stroke="#78350f" />
+      <ellipse cx="32" cy="336" rx="7" ry="12" fill="url(#goldGrad)" stroke="#78350f" />
+    </g>
+
+    <!-- Bookmark Ribbon Hanging Down -->
+    <path d="M 280 0 L 280 72 L 298 56 L 316 72 L 316 0 Z" fill="#ef4444" stroke="#991b1b" stroke-width="1.5" />
+
+    <!-- MAHJONG TILE (Centered on Notebook Cover) -->
+    <g transform="translate(112, 76)" filter="url(#tileShadow)">
+      <!-- Tile 3D Bamboo Green Bottom Layer -->
+      <rect x="0" y="16" width="168" height="216" rx="22" fill="url(#tileBacking)" />
+      <!-- Tile Ivory Front Face -->
+      <rect x="0" y="0" width="168" height="206" rx="20" fill="url(#tileSurface)" stroke="#cbd5e1" stroke-width="2" />
+      
+      <!-- Inner Subtle Border on Tile -->
+      <rect x="8" y="8" width="152" height="190" rx="14" fill="none" stroke="#e2e8f0" stroke-width="1.5" />
+
+      <!-- Mahjong 'Fa' (發) Character in Iconic Emerald & Jade Calligraphy -->
+      <g transform="translate(84, 103) scale(1.15)">
+        <!-- Beautiful Vector '發' Calligraphy Paths -->
+        <text x="0" y="28" font-family="'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif" font-weight="900" font-size="94" fill="#047857" text-anchor="middle" letter-spacing="1">發</text>
+      </g>
+    </g>
+
+    <!-- Pen / Stylus Accent in Notebook Edge -->
+    <g transform="translate(306, 170) rotate(22)">
+      <!-- Pencil Body -->
+      <rect x="0" y="0" width="14" height="150" rx="3" fill="url(#goldGrad)" />
+      <!-- Tip -->
+      <polygon points="0,150 14,150 7,172" fill="#e2e8f0" stroke="#475569" stroke-width="1" />
+      <polygon points="5,166 9,166 7,172" fill="#0f172a" />
+      <!-- Eraser Cap -->
+      <rect x="0" y="-12" width="14" height="12" rx="2" fill="#ef4444" />
+      <rect x="0" y="-3" width="14" height="4" fill="#cbd5e1" />
+    </g>
+  </g>
+</svg>
