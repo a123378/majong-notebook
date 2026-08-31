@@ -86,8 +86,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setActiveGame(createNewGameSession(savedBase, savedTai));
         }
 
-        const history = await getAllGameHistoryDB();
-        setHistorySessions(history);
+        // Fetch from IndexedDB first for fast load
+        const localHistory = await getAllGameHistoryDB();
+        setHistorySessions(localHistory);
+        
+        // Then fetch from Firebase silently in the background
+        import('../services/syncService').then(async ({ fetchRemoteSessions }) => {
+          const remoteSessions = await fetchRemoteSessions('PERSONAL');
+          if (remoteSessions.length > 0) {
+            setHistorySessions(remoteSessions);
+          }
+        });
+        
       } catch (e) {
         console.error('Failed to init GameContext:', e);
       } finally {
