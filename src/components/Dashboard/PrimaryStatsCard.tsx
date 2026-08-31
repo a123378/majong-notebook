@@ -18,16 +18,18 @@ export const PrimaryStatsCard: React.FC = () => {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     if (hours > 0) {
-      return \\ 小時 \ 分\;
+      return `${hours} 小時 ${remainingMinutes} 分`;
     }
-    return \\ 分鐘\;
+    return `${remainingMinutes} 分鐘`;
   };
 
   return (
     <div className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-800 shadow-xl">
       {/* Background Decorative Radial Gradient & Mahjong Glow */}
       <div
-        className={\bsolute -right-12 -top-12 w-48 h-48 rounded-full blur-3xl opacity-20 dark:opacity-30 pointer-events-none transition-colors duration-500 \\}
+        className={`absolute -right-12 -top-12 w-48 h-48 rounded-full blur-3xl opacity-20 dark:opacity-30 pointer-events-none transition-colors duration-500 ${
+          isPositive ? 'bg-emerald-500' : isNegative ? 'bg-rose-500' : 'bg-amber-500'
+        }`}
       />
       <div className="absolute -left-12 -bottom-12 w-44 h-44 rounded-full blur-3xl opacity-10 dark:opacity-20 pointer-events-none bg-teal-500" />
 
@@ -49,7 +51,13 @@ export const PrimaryStatsCard: React.FC = () => {
       <div className="mt-8 mb-6 flex flex-col items-center justify-center relative z-10">
         <div className="flex items-center gap-2 mb-2">
           <div
-            className={\p-1.5 rounded-full \\}
+            className={`p-1.5 rounded-full ${
+              isPositive
+                ? 'bg-emerald-100/50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                : isNegative
+                ? 'bg-rose-100/50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400'
+                : 'bg-slate-100 dark:bg-slate-800/50 text-slate-400'
+            }`}
           >
             {isPositive ? (
               <TrendingUp size={24} strokeWidth={2.5} />
@@ -66,12 +74,24 @@ export const PrimaryStatsCard: React.FC = () => {
 
         <div className="flex items-baseline gap-1 relative group cursor-default">
           <span
-            className={\	ext-4xl sm:text-5xl font-black font-mono tracking-tighter transition-colors duration-500 \\}
+            className={`text-4xl sm:text-5xl font-black font-mono tracking-tighter transition-colors duration-500 ${
+              isPositive
+                ? 'text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                : isNegative
+                ? 'text-rose-500 dark:text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.2)]'
+                : 'text-slate-700 dark:text-slate-300'
+            }`}
           >
-            {isPositive ? '+' : isNegative ? '-' : ''}$
+            {isPositive ? '+' : isNegative ? '-' : ''}
           </span>
           <span
-            className={\	ext-6xl sm:text-7xl md:text-8xl font-black font-mono tracking-tighter transition-colors duration-500 \\}
+            className={`text-6xl sm:text-7xl md:text-8xl font-black font-mono tracking-tighter transition-colors duration-500 ${
+              isPositive
+                ? 'text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                : isNegative
+                ? 'text-rose-600 dark:text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.2)]'
+                : 'text-slate-800 dark:text-slate-100'
+            }`}
           >
             {formattedAmount}
           </span>
