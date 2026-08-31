@@ -161,8 +161,21 @@ export const HistoryView: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {historySessions.map((session) => {
+        <div className="space-y-6">
+          {Object.entries(
+            historySessions.reduce((acc, session) => {
+              const d = new Date(session.startTime);
+              const monthKey = `${d.getFullYear()}年${d.getMonth() + 1}月`;
+              if (!acc[monthKey]) acc[monthKey] = [];
+              acc[monthKey].push(session);
+              return acc;
+            }, {} as Record<string, import('../../types/mahjong').GameSession[]>)
+          ).map(([month, sessions]) => (
+            <div key={month} className="space-y-3">
+              <h3 className="text-sm font-black text-slate-400 border-b border-slate-200 dark:border-slate-800 pb-1 px-1">
+                {month} <span className="text-xs font-normal">({sessions.length} 局)</span>
+              </h3>
+              {sessions.map((session) => {
             const isExpanded = expandedSessionId === session.id;
             const isPositive = session.netAmount > 0;
             const isNegative = session.netAmount < 0;
@@ -326,6 +339,8 @@ export const HistoryView: React.FC = () => {
               </div>
             );
           })}
+            </div>
+          ))}
         </div>
       )}
 
