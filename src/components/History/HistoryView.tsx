@@ -112,7 +112,7 @@ export const HistoryView: React.FC = () => {
           <div className="flex items-baseline justify-center gap-1">
             <span
               className={`text-2xl font-black ${
-                isTotalPositive ? 'text-emerald-400' : isTotalNegative ? 'text-rose-400' : 'text-slate-400'
+                isTotalPositive ? 'text-emerald-500 dark:text-emerald-400' : isTotalNegative ? 'text-rose-500 dark:text-rose-400' : 'text-slate-400'
               }`}
             >
               {isTotalPositive ? '+' : isTotalNegative ? '-' : ''}$
@@ -120,10 +120,10 @@ export const HistoryView: React.FC = () => {
             <span
               className={`text-4xl sm:text-5xl font-black font-mono tracking-tight ${
                 isTotalPositive
-                  ? 'text-emerald-400'
+                  ? 'text-emerald-600 dark:text-emerald-400'
                   : isTotalNegative
-                  ? 'text-rose-400'
-                  : 'text-slate-100'
+                  ? 'text-rose-600 dark:text-rose-400'
+                  : 'text-slate-700 dark:text-slate-300'
               }`}
             >
               {Math.abs(totalNetAmount).toLocaleString()}
@@ -138,15 +138,15 @@ export const HistoryView: React.FC = () => {
           </div>
           <div className="p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40">
             <span className="text-[10px] text-slate-400 block">總勝率</span>
-            <span className="text-sm font-black font-mono text-emerald-400">{overallWinRate}%</span>
+            <span className="text-sm font-black font-mono text-emerald-500 dark:text-emerald-400">{overallWinRate}%</span>
           </div>
           <div className="p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40">
             <span className="text-[10px] text-slate-400 block">總自摸</span>
-            <span className="text-sm font-black font-mono text-amber-400">{totalTsumoAll} 次</span>
+            <span className="text-sm font-black font-mono text-amber-500 dark:text-amber-400">{totalTsumoAll} 次</span>
           </div>
           <div className="p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40">
             <span className="text-[10px] text-slate-400 block">總放槍</span>
-            <span className="text-sm font-black font-mono text-rose-400">{totalDealInAll} 次</span>
+            <span className="text-sm font-black font-mono text-rose-500 dark:text-rose-400">{totalDealInAll} 次</span>
           </div>
         </div>
       </div>
