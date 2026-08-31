@@ -1,67 +1,53 @@
 import React, { useState, useMemo } from 'react';
-import {
-  Clock,
-  Trash2,
-  Share2,
-  ChevronDown,
-  ChevronUp,
-  Download,
-  Trophy,
-} from 'lucide-react';
 import { useGame } from '../../context/GameContext';
-import { GameSession } from '../../types/mahjong';
-import { BattleShareCard } from './BattleShareCard';
-import { playTileClickSound } from '../../services/sound';
+import { GameSession, RoundActionType } from '../../types/mahjong';
+import { Trophy, Clock, Trash2, ChevronDown, ChevronUp, Download } from 'lucide-react';
 
 export const HistoryView: React.FC = () => {
   const { historySessions, deleteHistorySession } = useGame();
-  const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
-  const [sharingSession, setSharingSession] = useState<GameSession | null>(null);
-  const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
+  const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
 
-  // Aggregate All-Time Stats
+  const toggleSession = (id: string) => {
+    setExpandedSessions(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleMonth = (monthKey: string) => {
+    setExpandedMonths(prev => {
+      const next = new Set(prev);
+      if (next.has(monthKey)) next.delete(monthKey);
+      else next.add(monthKey);
+      return next;
+    });
+  };
+
   const totalGames = historySessions.length;
-  let totalNetAmount = 0;
-  let totalRoundsAll = 0;
-  let totalTsumoAll = 0;
-  let totalWinAll = 0;
-  let totalDealInAll = 0;
+  const totalNetAmount = historySessions.reduce((sum, s) => sum + s.netAmount, 0);
+  const totalRoundsAll = historySessions.reduce((sum, s) => sum + s.stats.totalRounds, 0);
+  const totalWinAll = historySessions.reduce((sum, s) => sum + s.stats.winCount, 0);
+  const totalTsumoAll = historySessions.reduce((sum, s) => sum + s.stats.tsumoCount, 0);
+  const totalDealInAll = historySessions.reduce((sum, s) => sum + s.stats.dealInCount, 0);
 
-  for (const s of historySessions) {
-    totalNetAmount += s.netAmount;
-    totalRoundsAll += s.stats.totalRounds;
-    totalTsumoAll += s.stats.tsumoCount;
-    totalWinAll += s.stats.winCount;
-    totalDealInAll += s.stats.dealInCount;
-  }
-
-  const overallWinRate =
-    totalRoundsAll > 0
-      ? (((totalTsumoAll + totalWinAll) / totalRoundsAll) * 100).toFixed(1)
-      : '0.0';
-
+  const overallWinRate = totalRoundsAll > 0 ? ((totalWinAll / totalRoundsAll) * 100).toFixed(1) : '0.0';
   const isTotalPositive = totalNetAmount > 0;
   const isTotalNegative = totalNetAmount < 0;
 
-  const toggleExpandSession = (id: string) => {
-    playTileClickSound();
-    setExpandedSessionId(expandedSessionId === id ? null : id);
-  };
-
-  const toggleMonth = (month: string) => {
-    playTileClickSound();
-    setExpandedMonths(prev => ({ ...prev, [month]: prev[month] === false ? true : false }));
-  };
-
-  const handleExportJSON = () => {
-    playTileClickSound();
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(historySessions, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `mahjong_history_${new Date().toISOString().slice(0, 10)}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+  const handleExportJson = () => {
+    const dataStr = JSON.stringify(historySessions, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mahjong_backup_${new Date().getTime()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const formatDateTime = (ts: number) => {
@@ -151,14 +137,14 @@ export const HistoryView: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between px-1 mt-6 mb-2">
+      <div className="flex items-center justify-between px-1 mb-2">
         <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-          雀局歷史列表 ({historySessions.length})
+          單局歷史列表 ({historySessions.length})
         </h3>
         {historySessions.length > 0 && (
           <button
-            onClick={handleExportJSON}
-            className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-all"
+            onClick={handleExportJson}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors text-xs"
           >
             <Download size={13} />
             <span>匯出 JSON 備份</span>
@@ -175,218 +161,195 @@ export const HistoryView: React.FC = () => {
             尚無歷史戰績
           </h4>
           <p className="text-xs text-slate-400 max-w-xs mx-auto">
-            當您在記帳主頁點擊「結束本場並開新局」時，戰局將自動歸檔並統計於此。
+            當您在記帳主頁點擊「結算本場並開新局」時，戰局將自動歸檔並統計於此。
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {Object.entries(groupedData).map(([month, days]) => {
-            const isMonthExpanded = expandedMonths[month] !== false; // Default true
-            let monthTotalGames = 0;
-            Object.values(days).forEach(arr => monthTotalGames += arr.length);
+        <div className="space-y-4">
+          {Object.entries(groupedData)
+            .sort(([monthA], [monthB]) => monthB.localeCompare(monthA))
+            .map(([month, days]) => {
+              const isMonthExpanded = expandedMonths.has(month);
+              const monthTotalGames = Object.values(days).reduce((acc, curr) => acc + curr.length, 0);
 
-            return (
-              <div key={month} className="space-y-3">
-                {/* Month Accordion Header */}
-                <div 
-                  onClick={() => toggleMonth(month)}
-                  className="flex items-center justify-between cursor-pointer border-b border-slate-200 dark:border-slate-800 pb-2 px-1 hover:opacity-80 transition-opacity"
-                >
-                  <h3 className="text-sm font-black text-slate-600 dark:text-slate-300">
-                    {month} <span className="text-xs font-normal text-slate-400">({monthTotalGames} 場)</span>
-                  </h3>
-                  <div className="text-slate-400">
-                    {isMonthExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              return (
+                <div key={month} className="space-y-2">
+                  <div
+                    onClick={() => toggleMonth(month)}
+                    className="flex items-center justify-between py-2 px-3 bg-slate-200/50 dark:bg-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                  >
+                    <h3 className="text-sm font-black text-slate-600 dark:text-slate-300">
+                      {month} <span className="text-xs font-normal text-slate-400">({monthTotalGames} 場)</span>
+                    </h3>
+                    <div className="text-slate-400">
+                      {isMonthExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </div>
                   </div>
-                </div>
-                
-                {/* Month Content (Grouped by Day) */}
-                {isMonthExpanded && (
-                  <div className="space-y-5 pt-1 pl-1 border-l-2 border-slate-100 dark:border-slate-800 ml-1">
-                    {Object.entries(days).map(([day, sessions]) => (
-                      <div key={day} className="space-y-3">
-                        {/* Day Header */}
-                        <div className="flex items-center gap-2 pl-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                          <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400">{day}</h4>
-                        </div>
-                        
-                        {/* Day Sessions List */}
-                        <div className="space-y-3 pl-3">
-                          {sessions.map((session) => {
-                            const isExpanded = expandedSessionId === session.id;
-                            const isPositive = session.netAmount > 0;
-                            const isNegative = session.netAmount < 0;
 
-                            return (
-                              <div
-                                key={session.id}
-                                className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all overflow-hidden"
-                              >
-                                <div
-                                  onClick={() => toggleExpandSession(session.id)}
-                                  className="p-4 sm:p-5 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-                                >
-                                  <div className="min-w-0">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <span className="font-black text-sm sm:text-base text-slate-900 dark:text-slate-100 truncate">
-                                        {session.title || '麻將戰局'}
-                                      </span>
-                                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-mono">
-                                        底{session.base}/台{session.taiPrice}
-                                      </span>
-                                    </div>
+                  {isMonthExpanded && (
+                    <div className="space-y-4 pl-2 border-l-2 border-slate-200 dark:border-slate-800 ml-2">
+                      {Object.entries(days)
+                        .sort(([dayA], [dayB]) => dayB.localeCompare(dayA))
+                        .map(([day, sessions]) => (
+                          <div key={`${month}-${day}`} className="space-y-2 relative">
+                            <div className="absolute -left-[14px] top-2 w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
+                            <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 pl-2">
+                              {day}
+                            </h4>
 
-                                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                                      <span className="flex items-center gap-1 font-mono">
-                                        <Clock size={12} />
-                                        {formatDateTime(session.startTime)}
-                                      </span>
-                                      <span>·</span>
-                                      <span>{session.stats.totalRounds} 局</span>
-                                      <span>·</span>
-                                      <span className="text-amber-500 font-bold">
-                                        自摸 {session.stats.tsumoCount} 次
-                                      </span>
-                                    </div>
-                                  </div>
+                            <div className="space-y-2.5">
+                              {sessions.map(session => {
+                                const isExpanded = expandedSessions.has(session.id);
+                                const isPositive = session.netAmount > 0;
+                                const isNegative = session.netAmount < 0;
+                                const actionMap: Record<RoundActionType, string> = {
+                                  win: '胡牌',
+                                  dealIn: '放槍',
+                                  tsumo: '自摸',
+                                  tsumoLoss: '被自摸',
+                                  draw: '和局'
+                                };
 
-                                  <div className="flex items-center gap-3 flex-shrink-0">
+                                return (
+                                  <div
+                                    key={session.id}
+                                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md"
+                                  >
                                     <div
-                                      className={`text-right font-mono font-black text-lg sm:text-xl ${
-                                        isPositive
-                                          ? 'text-emerald-500 dark:text-emerald-400'
-                                          : isNegative
-                                          ? 'text-rose-500 dark:text-rose-400'
-                                          : 'text-slate-400'
-                                      }`}
+                                      onClick={() => toggleSession(session.id)}
+                                      className="p-3 sm:p-4 cursor-pointer flex items-center justify-between gap-2"
                                     >
-                                      {isPositive ? `+$${session.netAmount}` : isNegative ? `-$${Math.abs(session.netAmount)}` : '$0'}
-                                    </div>
-
-                                    <div className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
-                                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {isExpanded && (
-                                  <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                                    <div className="grid grid-cols-4 gap-1.5 py-3 text-center border-b border-slate-200 dark:border-slate-800 mb-3 text-xs">
-                                      <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                                        <span className="text-[10px] text-slate-400 block">胡牌</span>
-                                        <span className="font-bold text-emerald-500 font-mono">
-                                          {session.stats.winCount} 次 ({session.stats.winRate}%)
-                                        </span>
-                                      </div>
-                                      <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                                        <span className="text-[10px] text-slate-400 block">放槍</span>
-                                        <span className="font-bold text-rose-500 font-mono">
-                                          {session.stats.dealInCount} 次 ({session.stats.dealInRate}%)
-                                        </span>
-                                      </div>
-                                      <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                                        <span className="text-[10px] text-slate-400 block">被自摸</span>
-                                        <span className="font-bold text-orange-500 font-mono">
-                                          {session.stats.tsumoLossCount} 次
-                                        </span>
-                                      </div>
-                                      <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
-                                        <span className="text-[10px] text-slate-400 block">綜合勝率</span>
-                                        <span className="font-bold text-amber-500 font-mono">
-                                          {session.stats.overallWinRate}%
-                                        </span>
-                                      </div>
-                                    </div>
-
-                                    <h5 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                      回合明細紀錄
-                                    </h5>
-
-                                    <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
-                                      {session.rounds.map((r, rIdx) => (
-                                        <div
-                                          key={r.id || rIdx}
-                                          className="p-2.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-700/80 flex items-center justify-between text-xs"
-                                        >
-                                          <div>
-                                            <div className="flex items-center gap-1.5 font-semibold">
-                                              <span className="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-700 text-[10px] flex items-center justify-center font-mono font-bold">
-                                                {session.rounds.length - rIdx}
-                                              </span>
-                                              <span className="text-slate-800 dark:text-slate-200">
-                                                {r.formattedFormula}
-                                              </span>
-                                            </div>
-                                            {r.note && (
-                                              <p className="mt-1 ml-6.5 text-[10px] text-slate-500 italic">"{r.note}"</p>
-                                            )}
-                                          </div>
-                                          <span
-                                            className={`font-mono font-bold ${
-                                              r.amount > 0
-                                                ? 'text-emerald-500'
-                                                : r.amount < 0
-                                                ? 'text-rose-500'
-                                                : 'text-slate-400'
-                                            }`}
-                                          >
-                                            {r.amount > 0 ? `+$${r.amount}` : r.amount < 0 ? `-$${Math.abs(r.amount)}` : '$0'}
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="font-black text-sm sm:text-base text-slate-900 dark:text-slate-100 truncate">
+                                            {session.title || '麻將戰局'}
+                                          </span>
+                                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-mono">
+                                            底{session.base}/台{session.taiPrice}
                                           </span>
                                         </div>
-                                      ))}
+                                        <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                                          <div className="flex items-center gap-1">
+                                            <Clock size={12} />
+                                            <span className="font-mono">{formatDateTime(session.startTime)}</span>
+                                          </div>
+                                          <span>·</span>
+                                          <span>{session.stats.totalRounds} 局</span>
+                                          <span>·</span>
+                                          <span className="text-amber-500 font-bold">
+                                            自摸 {session.stats.tsumoCount} 次
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex flex-col items-end shrink-0 gap-1 pl-2">
+                                        <div
+                                          className={`font-black font-mono text-lg sm:text-xl ${
+                                            isPositive
+                                              ? 'text-emerald-500 dark:text-emerald-400'
+                                              : isNegative
+                                              ? 'text-rose-500 dark:text-rose-400'
+                                              : 'text-slate-400'
+                                          }`}
+                                        >
+                                          {isPositive ? `+$${session.netAmount}` : isNegative ? `-$${Math.abs(session.netAmount)}` : '$0'}
+                                        </div>
+                                        <div className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
+                                          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                        </div>
+                                      </div>
                                     </div>
 
-                                    <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-slate-200 dark:border-slate-800">
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          playTileClickSound();
-                                          setSharingSession(session);
-                                        }}
-                                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold text-xs hover:bg-emerald-100 transition-all"
-                                      >
-                                        <Share2 size={13} />
-                                        <span>戰報分享</span>
-                                      </button>
+                                    {isExpanded && (
+                                      <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        
+                                        <div className="grid grid-cols-4 gap-2 mb-4 text-center">
+                                          <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                                            <span className="text-[10px] text-slate-400 block">胡牌</span>
+                                            <span className="font-bold text-emerald-500 font-mono">
+                                              {session.stats.winCount} 次 ({session.stats.winRate}%)
+                                            </span>
+                                          </div>
+                                          <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                                            <span className="text-[10px] text-slate-400 block">放槍</span>
+                                            <span className="font-bold text-rose-500 font-mono">
+                                              {session.stats.dealInCount} 次 ({session.stats.dealInRate}%)
+                                            </span>
+                                          </div>
+                                          <div className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                                            <span className="text-[10px] text-slate-400 block">被自摸</span>
+                                            <span className="font-bold text-orange-500 font-mono">
+                                              {session.stats.tsumoLossCount} 次
+                                            </span>
+                                          </div>
 
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          if (window.confirm('確定要永久刪除此場戰績嗎？(無法復原)')) {
-                                            deleteHistorySession(session.id);
-                                          }
-                                        }}
-                                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold text-xs hover:bg-rose-100 transition-all"
-                                      >
-                                        <Trash2 size={13} />
-                                        <span>刪除紀錄</span>
-                                      </button>
-                                    </div>
+                                        </div>
+
+                                        <h5 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                                          單局明細紀錄
+                                        </h5>
+                                        <div className="space-y-1.5 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                                          {session.rounds.map((r, i) => (
+                                            <div
+                                              key={r.id}
+                                              className="flex items-center justify-between py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700"
+                                            >
+                                              <div className="flex items-center gap-2">
+                                                <span className="text-xs font-mono text-slate-400 w-6">
+                                                  #{i + 1}
+                                                </span>
+                                                <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                  {actionMap[r.actionType]} {r.taiCount > 0 ? `(${r.taiCount}台)` : ''}
+                                                </span>
+                                              </div>
+                                              <span
+                                                className={`text-sm font-black font-mono ${
+                                                  r.amount > 0
+                                                    ? 'text-emerald-500'
+                                                    : r.amount < 0
+                                                    ? 'text-rose-500'
+                                                    : 'text-slate-400'
+                                                }`}
+                                              >
+                                                {r.amount > 0 ? `+$${r.amount}` : r.amount < 0 ? `-$${Math.abs(r.amount)}` : '$0'}
+                                              </span>
+                                            </div>
+                                          ))}
+                                          {session.rounds.length === 0 && (
+                                            <div className="text-center py-4 text-slate-400 text-xs">
+                                              無明細紀錄
+                                            </div>
+                                          )}
+                                        </div>
+
+                                        <div className="mt-4 flex gap-2">                                          
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (window.confirm('確定要永久刪除此場戰績嗎？(無法復原)')) {
+                                                deleteHistorySession(session.id);
+                                              }
+                                            }}
+                                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/50 font-bold text-xs transition-colors"
+                                          >
+                                            <Trash2 size={13} />
+                                            <span>刪除紀錄</span>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
-      )}
-
-      {/* Battle Share Modal */}
-      {sharingSession && (
-        <BattleShareCard
-          session={sharingSession}
-          onClose={() => setSharingSession(null)}
-        />
       )}
     </div>
   );

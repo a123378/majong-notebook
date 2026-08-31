@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { TrendingUp, TrendingDown, Minus, Clock, Flame } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 
@@ -25,7 +25,6 @@ export const PrimaryStatsCard: React.FC = () => {
 
   return (
     <div className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-800 shadow-xl">
-      {/* Background Decorative Radial Gradient & Mahjong Glow */}
       <div
         className={`absolute -right-12 -top-12 w-48 h-48 rounded-full blur-3xl opacity-20 dark:opacity-30 pointer-events-none transition-colors duration-500 ${
           isPositive ? 'bg-emerald-500' : isNegative ? 'bg-rose-500' : 'bg-amber-500'
@@ -33,7 +32,6 @@ export const PrimaryStatsCard: React.FC = () => {
       />
       <div className="absolute -left-12 -bottom-12 w-44 h-44 rounded-full blur-3xl opacity-10 dark:opacity-20 pointer-events-none bg-teal-500" />
 
-      {/* Card Header Tag */}
       <div className="flex items-center justify-between gap-2 mb-3 relative z-10">
         <div className="flex items-center gap-2">
           <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 bg-white/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 backdrop-blur-sm">
@@ -82,7 +80,7 @@ export const PrimaryStatsCard: React.FC = () => {
                 : 'text-slate-700 dark:text-slate-300'
             }`}
           >
-            {isPositive ? '+' : isNegative ? '-' : ''}
+            {isPositive ? '+' : isNegative ? '-' : ''}$
           </span>
           <span
             className={`text-6xl sm:text-7xl md:text-8xl font-black font-mono tracking-tighter transition-colors duration-500 ${
@@ -98,7 +96,6 @@ export const PrimaryStatsCard: React.FC = () => {
         </div>
       </div>
 
-      {/* Footer Stats Row */}
       <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800/60 relative z-10">
         <div className="flex flex-col text-left pl-2">
           <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">

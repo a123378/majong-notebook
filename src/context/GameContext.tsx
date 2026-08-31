@@ -53,7 +53,7 @@ function createNewGameSession(base = 50, taiPrice = 20): GameSession {
 
   return {
     id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `game_${Date.now()}`,
-    title: `暻餃??啣? (${dateStr})`,
+    title: `麻將戰局 (${dateStr})`,
     base,
     taiPrice,
     startTime: Date.now(),
@@ -173,7 +173,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Play Sound
       if (round.actionType === 'tsumo' || round.actionType === 'win') {
         playWinSound();
-        // Confetti for Big Win (e.g. >= 4??or net >= 200)
+        // Confetti for Big Win (e.g. >= 4台 or net >= 200)
         if (round.taiCount >= 4 || round.amount >= 200) {
           try {
             confetti({

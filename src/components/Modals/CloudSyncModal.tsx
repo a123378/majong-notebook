@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Cloud, Check, LogOut, KeyRound, Mail, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Cloud, Mail, KeyRound, LogOut, CheckCircle2 } from 'lucide-react';
 import { useSync } from '../../context/SyncContext';
-import { playTileClickSound } from '../../services/sound';
-import { auth } from '../../services/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 
 interface CloudSyncModalProps {
   isOpen: boolean;
@@ -12,23 +10,22 @@ interface CloudSyncModalProps {
 
 export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose }) => {
   const { isOnline } = useSync();
+  const auth = getAuth();
+  
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [user, setUser] = useState(auth.currentUser);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(u => setUser(u));
-    return () => unsubscribe();
-  }, []);
+  const user = auth.currentUser;
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    playTileClickSound();
+    if (!email || !password) return;
+    
     setLoading(true);
     setError('');
 
@@ -39,16 +36,19 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
         await createUserWithEmailAndPassword(auth, email, password);
       }
       
-      import('../../services/syncService').then(({ processOfflineSyncQueue }) => {
-        processOfflineSyncQueue();
-      });
-      
-      onClose(); // Close modal on success
+      setEmail('');
+      setPassword('');
+      onClose();
     } catch (err: any) {
+      console.error('Auth error:', err);
       if (err.code === 'auth/operation-not-allowed') {
-        setError('請先至 Firebase 後台啟用 Email/Password 驗證。');
+        setError('請前往 Firebase 後台啟用 Email/Password 驗證');
+      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+        setError('帳號或密碼錯誤');
+      } else if (err.code === 'auth/email-already-in-use') {
+        setError('此信箱已經被註冊過了');
       } else {
-        setError(err.message || '登入失敗，請檢查帳號密碼。');
+        setError(err.message || '登入/註冊失敗，請稍後再試');
       }
     } finally {
       setLoading(false);
@@ -56,49 +56,43 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
   };
 
   const handleLogout = async () => {
-    playTileClickSound();
-    await signOut(auth);
-    onClose();
+    setLoading(true);
+    try {
+      await signOut(auth);
+      onClose();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-      
-      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-pop">
+      <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl relative">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+          className="absolute right-4 top-4 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 transition-all"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <Cloud size={24} />
+        <div className="flex flex-col items-center mb-6 mt-2">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
+            <Cloud size={32} className="text-white" />
           </div>
-          <div>
-            <h2 className="text-xl font-black text-slate-800 dark:text-slate-100">
-              雲端同步設定
-            </h2>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              {user ? '已連線至雲端' : '登入以啟用跨裝置同步'}
-            </p>
-          </div>
+          <h2 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-1">
+            雲端同步
+          </h2>
+          <p className="text-xs font-bold text-slate-500">
+            {isOnline ? '🟢 已連線至網際網路' : '🔴 離線中 (僅支援本地儲存)'}
+          </p>
         </div>
-
-        {!isOnline && (
-          <div className="p-3 mb-4 text-xs font-bold bg-amber-50 dark:bg-amber-950/30 text-amber-600 rounded-xl">
-            目前處於離線狀態，登入功能可能無法運作。
-          </div>
-        )}
 
         {user ? (
           <div className="space-y-4">
-            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/50 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600">
-                <Check size={20} />
-              </div>
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/50">
+              <CheckCircle2 size={24} className="text-emerald-500 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-0.5">已登入雲端帳號</p>
                 <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{user.email}</p>

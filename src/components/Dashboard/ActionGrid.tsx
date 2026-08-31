@@ -28,9 +28,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onSelectAction, onQuickD
         <span className="text-[11px] text-slate-600 dark:text-slate-400">點擊按鈕進入輸入</span>
       </div>
 
-      {/* Main 4 Action Buttons Grid (2x2) */}
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-        {/* 胡 牌 */}
         <button
           type="button"
           onClick={() => handleClick('win')}
@@ -43,7 +41,6 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onSelectAction, onQuickD
           <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl pointer-events-none group-hover:bg-white/20 transition-colors" />
         </button>
 
-        {/* 丟 槍 */}
         <button
           type="button"
           onClick={() => handleClick('dealIn')}
@@ -56,7 +53,6 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onSelectAction, onQuickD
           <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl pointer-events-none group-hover:bg-white/20 transition-colors" />
         </button>
 
-        {/* 自 摸 */}
         <button
           type="button"
           onClick={() => handleClick('tsumo')}
@@ -69,7 +65,6 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onSelectAction, onQuickD
           <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl pointer-events-none group-hover:bg-white/20 transition-colors" />
         </button>
 
-        {/* 被自摸 */}
         <button
           type="button"
           onClick={() => handleClick('tsumoLoss')}
@@ -83,7 +78,6 @@ export const ActionGrid: React.FC<ActionGridProps> = ({ onSelectAction, onQuickD
         </button>
       </div>
 
-      {/* Quick Action: Draw (流局) */}
       <button
         type="button"
         onClick={() => handleClick('draw')}

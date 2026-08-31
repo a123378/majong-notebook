@@ -19,7 +19,7 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenEndGame: () => void;
-    onOpenInstall: () => void;
+  onOpenInstall: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -62,8 +62,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/70 backdrop-blur-sm animate-pop">
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-2xl relative flex flex-col max-h-[92vh] overflow-y-auto">
-        {/* Header */}
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-2xl relative flex flex-col max-h-[92vh] overflow-y-auto custom-scrollbar">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
           <div className="flex items-center gap-2">
             <Sliders size={20} className="text-emerald-500" />
@@ -79,28 +78,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        {/* SECTION 1: 金額設定 (雀局規格) */}
-        <div className="mb-5">
+        {savedSuccess && (
+          <div className="mb-4 flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 py-2 rounded-xl animate-pop text-sm font-bold">
+            <Check size={16} />
+            <span>設定已套用！</span>
+          </div>
+        )}
+
+        <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              雀局底台金額設定
+            <span className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              設定底台金額
             </span>
-            {savedSuccess && (
-              <span className="text-xs font-bold text-emerald-500 flex items-center gap-1">
-                <Check size={13} /> 已儲存
-              </span>
-            )}
           </div>
 
-          {/* Quick Presets Grid */}
-          <div className="grid grid-cols-3 gap-1.5 mb-3">
-            {DEFAULT_PRESETS.map((p) => {
-              const isActive =
-                parseInt(baseInput, 10) === p.base && parseInt(taiInput, 10) === p.taiPrice;
+          <div className="grid grid-cols-4 gap-2 mb-3">
+            {DEFAULT_PRESETS.map((p, idx) => {
+              const isActive = baseInput === p.base.toString() && taiInput === p.taiPrice.toString();
               return (
                 <button
-                  key={p.id}
-                  type="button"
+                  key={idx}
                   onClick={() => handleSelectPreset(p.base, p.taiPrice)}
                   className={`py-2 px-1 rounded-xl text-xs font-bold border transition-all text-center ${
                     isActive
@@ -114,7 +111,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             })}
           </div>
 
-          {/* Custom Base and Tai Inputs */}
           <div className="grid grid-cols-2 gap-3 mb-2.5">
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
@@ -153,13 +149,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        {/* SECTION 2: 系統與外觀 */}
         <div className="mb-5 space-y-2">
           <span className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
             外觀與系統控制
           </span>
 
-          {/* Sound Effects */}
           <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
             <div className="flex items-center gap-2">
               {soundOn ? <Volume2 size={18} className="text-emerald-500" /> : <VolumeX size={18} className="text-slate-400" />}
@@ -182,17 +176,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
 
-          {/* PWA Installation Card */}
           {(!isInstalled || isInstallable) && (
             <div className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
               <div className="flex items-center gap-2">
                 <Smartphone size={18} className="text-emerald-600 dark:text-emerald-400" />
                 <div>
                   <span className="text-xs font-bold block text-slate-800 dark:text-slate-200">
-                    安裝至桌面或手機
+                    安裝桌面版 App
                   </span>
                   <span className="text-[11px] text-slate-600 dark:text-slate-400">
-                    全螢幕 App 體驗、離線極速載入
+                    全螢幕 App 體驗、離線極速存取
                   </span>
                 </div>
               </div>
@@ -210,13 +203,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           )}
         </div>
 
-        {/* SECTION 3: 結算與重置 */}
         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
           <span className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-            雀局結算與管理
+            戰局結算與管理
           </span>
 
-          {/* 🏁 結束本場並開新局 */}
           <button
             type="button"
             onClick={() => {
@@ -226,10 +217,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-98 text-white font-bold text-sm shadow-md shadow-amber-500/20 transition-all"
           >
             <Flag size={16} />
-            <span>🏁 結束本場並開新局 (結算歸檔)</span>
+            <span>🏁 結算本場並開新局 (結算歸檔)</span>
           </button>
 
-          {/* 🔄 重置本場數據 */}
           <button
             type="button"
             onClick={() => {
