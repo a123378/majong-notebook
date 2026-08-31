@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import {
   X,
   Sliders,
-  Moon,
-  Sun,
   Volume2,
   VolumeX,
   Wifi,
@@ -14,7 +12,6 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
-import { useTheme } from '../../context/ThemeContext';
 import { usePwa } from '../../context/PwaContext';
 import { useSync } from '../../context/SyncContext';
 import { DEFAULT_PRESETS } from '../../types/mahjong';
@@ -36,7 +33,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onOpenInstall,
 }) => {
   const { activeGame, setBaseAndTai, resetCurrentGame } = useGame();
-  const { theme, toggleTheme } = useTheme();
   const { isInstallable, isInstalled } = usePwa();
   const { config } = useSync();
 
