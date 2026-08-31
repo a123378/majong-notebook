@@ -97,8 +97,9 @@ export const NumpadModal: React.FC<NumpadModalProps> = ({
       roundNumber: activeGame.rounds.length + 1,
     });
 
-    await addRound(round);
     onClose();
+    // Fire and forget (or await in background) so UI doesn't block
+    addRound(round).catch(console.error);
   };
 
   const getActionTheme = () => {

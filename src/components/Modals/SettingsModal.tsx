@@ -168,28 +168,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             外觀與系統控制
           </span>
 
-          {/* Theme Switcher */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
-            <div className="flex items-center gap-2">
-              {theme === 'dark' ? <Moon size={18} className="text-purple-400" /> : <Sun size={18} className="text-amber-500" />}
-              <div>
-                <span className="text-xs font-bold block text-slate-800 dark:text-slate-200">主題外觀</span>
-                <span className="text-[11px] text-slate-600 dark:text-slate-400">
-                  {theme === 'dark' ? '深色模式 (Dark)' : '淺色模式 (Light)'}
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                playTileClickSound();
-                toggleTheme();
-              }}
-              className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-600 transition-all"
-            >
-              切換為 {theme === 'dark' ? '淺色' : '深色'}
-            </button>
-          </div>
-
           {/* Sound Effects */}
           <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
             <div className="flex items-center gap-2">

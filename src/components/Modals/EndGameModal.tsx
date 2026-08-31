@@ -32,9 +32,9 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
   };
 
   const handleConfirmEndGame = async () => {
-    await finishAndArchiveGame();
     onClose();
     onViewHistory();
+    finishAndArchiveGame().catch(console.error);
   };
 
   return (
