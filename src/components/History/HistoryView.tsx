@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Clock,
   Trash2,
@@ -180,7 +180,7 @@ export const HistoryView: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {Object.entries(groupedData).map(([month, days], mIdx) => {
+          {Object.entries(groupedData).map(([month, days]) => {
             const isMonthExpanded = expandedMonths[month] !== false; // Default true
             let monthTotalGames = 0;
             Object.values(days).forEach(arr => monthTotalGames += arr.length);
