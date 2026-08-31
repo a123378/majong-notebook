@@ -7,8 +7,8 @@ import {
   setSettingDB,
   saveGameToHistoryDB,
 } from './db';
-import { db } from './firebase';
-import { doc, setDoc, deleteDoc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { db, auth } from './firebase';
+import { doc, setDoc, deleteDoc, collection, query, orderBy, onSnapshot, where } from 'firebase/firestore';
 
 const CLOUD_CONFIG_KEY = 'cloud_config';
 
@@ -113,8 +113,17 @@ export function subscribeToRemoteSessions(callback: (sessions: GameSession[]) =>
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
     return () => {};
   }
+  
+  // Only sync if logged in
+  if (!auth.currentUser) {
+    return () => {};
+  }
 
-  const q = query(collection(db, 'mahjong_sessions'), orderBy('startTime', 'desc'));
+  const q = query(
+    collection(db, 'mahjong_sessions'),
+    where('userId', '==', auth.currentUser.uid),
+    orderBy('startTime', 'desc')
+  );
   
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const sessions: GameSession[] = [];
@@ -135,11 +144,14 @@ export function subscribeToRemoteSessions(callback: (sessions: GameSession[]) =>
 }
 
 async function uploadToFirebase(item: SyncQueueItem): Promise<boolean> {
+  // Only upload if logged in
+  if (!auth.currentUser) return false;
   try {
     const docRef = doc(db, 'mahjong_sessions', item.data.id);
     // Firestore rejects `undefined` values. 
     // JSON.stringify strips undefined properties automatically.
     const cleanData = JSON.parse(JSON.stringify(item.data));
+    cleanData.userId = auth.currentUser.uid;
     await setDoc(docRef, cleanData, { merge: true });
     return true;
   } catch (e) {
@@ -158,6 +170,7 @@ if (typeof window !== 'undefined') {
 }
 
 export async function deleteRemoteSession(id: string): Promise<boolean> {
+  if (!auth.currentUser) return false;
   try {
     if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
     const docRef = doc(db, 'mahjong_sessions', id);
