@@ -4,7 +4,6 @@ import {
   Sliders,
   Volume2,
   VolumeX,
-  Wifi,
   Download,
   Flag,
   RotateCcw,
@@ -13,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { usePwa } from '../../context/PwaContext';
-import { useSync } from '../../context/SyncContext';
 import { DEFAULT_PRESETS } from '../../types/mahjong';
 import { getSoundEnabled, setSoundEnabled, playTileClickSound } from '../../services/sound';
 
@@ -21,21 +19,18 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenEndGame: () => void;
-  onOpenSync: () => void;
-  onOpenInstall: () => void;
+    onOpenInstall: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   onOpenEndGame,
-  onOpenSync,
   onOpenInstall,
 }) => {
   const { activeGame, setBaseAndTai, resetCurrentGame } = useGame();
   const { isInstallable, isInstalled } = usePwa();
-  const { config } = useSync();
-
+  
   const [baseInput, setBaseInput] = useState<string>(activeGame.base.toString());
   const [taiInput, setTaiInput] = useState<string>(activeGame.taiPrice.toString());
   const [soundOn, setSoundOn] = useState<boolean>(getSoundEnabled());
@@ -169,9 +164,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="flex items-center gap-2">
               {soundOn ? <Volume2 size={18} className="text-emerald-500" /> : <VolumeX size={18} className="text-slate-400" />}
               <div>
-                <span className="text-xs font-bold block text-slate-800 dark:text-slate-200">麻將落子與勝負音效</span>
+                <span className="text-xs font-bold block text-slate-800 dark:text-slate-200">麻將點擊反饋音效</span>
                 <span className="text-[11px] text-slate-600 dark:text-slate-400">
-                  {soundOn ? '已開啟 Web Audio 原生音效' : '已靜音'}
+                  {soundOn ? '已啟用 Web Audio 音效' : '已關閉'}
                 </span>
               </div>
             </div>
@@ -183,33 +178,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
               }`}
             >
-              {soundOn ? '開' : '關'}
-            </button>
-          </div>
-
-          {/* Cloud Room Sync */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
-            <div className="flex items-center gap-2">
-              <Wifi size={18} className={config.enabled ? 'text-emerald-500' : 'text-slate-400'} />
-              <div>
-                <span className="text-xs font-bold block text-slate-800 dark:text-slate-200">
-                  雲端跨裝置同步
-                </span>
-                <span className="text-[11px] text-slate-600 dark:text-slate-400">
-                  {config.enabled && config.roomCode
-                    ? `房間: ${config.roomCode}`
-                    : '未連線 (離線儲存中)'}
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                onClose();
-                onOpenSync();
-              }}
-              className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 transition-all"
-            >
-              房間設定
+              {soundOn ? '開啟' : '關閉'}
             </button>
           </div>
 

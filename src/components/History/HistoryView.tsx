@@ -94,11 +94,11 @@ export const HistoryView: React.FC = () => {
   return (
     <div className="space-y-4 pb-12">
       {/* Hero Card */}
-      <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white border border-slate-800 shadow-xl relative overflow-hidden">
+      <div className="rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Trophy size={18} className="text-amber-400" />
-            <h2 className="text-sm font-black uppercase tracking-wider text-slate-300">
+            <h2 className="text-sm font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
               歷史戰績總覽
             </h2>
           </div>
@@ -131,20 +131,20 @@ export const HistoryView: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-slate-800/80 text-center">
-          <div className="p-2 rounded-xl bg-slate-800/40 border border-slate-700/40">
-            <span className="text-[10px] text-slate-400 block">總局數</span>
-            <span className="text-sm font-black font-mono text-white">{totalRoundsAll} 局</span>
+        <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800/80 text-center">
+          <div className="p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 block">總局數</span>
+            <span className="text-sm font-black font-mono text-slate-800 dark:text-white">{totalRoundsAll} 局</span>
           </div>
-          <div className="p-2 rounded-xl bg-slate-800/40 border border-slate-700/40">
+          <div className="p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40">
             <span className="text-[10px] text-slate-400 block">總勝率</span>
             <span className="text-sm font-black font-mono text-emerald-400">{overallWinRate}%</span>
           </div>
-          <div className="p-2 rounded-xl bg-slate-800/40 border border-slate-700/40">
+          <div className="p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40">
             <span className="text-[10px] text-slate-400 block">總自摸</span>
             <span className="text-sm font-black font-mono text-amber-400">{totalTsumoAll} 次</span>
           </div>
-          <div className="p-2 rounded-xl bg-slate-800/40 border border-slate-700/40">
+          <div className="p-2 rounded-xl bg-slate-100/80 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/40">
             <span className="text-[10px] text-slate-400 block">總放槍</span>
             <span className="text-sm font-black font-mono text-rose-400">{totalDealInAll} 次</span>
           </div>

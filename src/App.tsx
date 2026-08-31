@@ -158,7 +158,6 @@ export const App: React.FC = () => {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         onOpenEndGame={() => setIsEndGameOpen(true)}
-        onOpenSync={() => setIsSyncOpen(true)}
         onOpenInstall={() => setIsInstallOpen(true)}
       />
 
