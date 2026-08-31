@@ -48,9 +48,6 @@ export const Header: React.FC<HeaderProps> = ({
               <h1 className="font-black text-lg text-slate-900 dark:text-slate-100 tracking-tight">
                 麻將紀錄
               </h1>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 border border-emerald-300/60 dark:border-emerald-800/60">
-                PWA
-              </span>
             </div>
             {/* Base & Tai Pill */}
             <div className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400 font-medium">
